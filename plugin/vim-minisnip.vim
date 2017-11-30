@@ -38,10 +38,31 @@ function! <SID>Minisnip()
         let s:placeholder_text = ''
         " remove the snippet name
         normal! "_diw
+
+        " get informations about file
+        let path = escape(s:snippetfile, '#%')
+        let linesCount = len(readfile(path))
+
         " insert the snippet
-        execute 'keepalt read ' . escape(s:snippetfile, '#%')
+        execute 'keepalt read ' . path
         " remove the empty line before the snippet
         normal! kJ
+
+        " fix indent
+        if col(".") > 0 && linesCount > 1
+            normal! 0yww
+            let index = 1
+            while index < linesCount
+                normal! j0Pl
+                let index = index + 1
+            endwhile
+            let index = 1
+            while index < linesCount
+                normal! k
+                let index = index + 1
+            endwhile
+        endif
+
         " select the first placeholder
         call s:SelectPlaceholder()
     else
